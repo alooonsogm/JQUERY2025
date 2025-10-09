@@ -198,13 +198,64 @@
     <main class="container">
         <div class="bg-body-tertiary p-5 rounded">
             <h1>Edit hospital</h1>
+            <input type="hidden" id="cajaid" class="form-control"><br>
+            <label>Nombre: </label>
+            <input type="text" id="cajanombre" class="form-control"><br>
+            <label>Dirección: </label>
+            <input type="text" id="cajadireccion" class="form-control"><br>
+            <label>Teléfono: </label>
+            <input type="text" id="cajatelefono" class="form-control"><br>
+            <label>Número de camas: </label>
+            <input type="text" id="cajacamas" class="form-control"><br>
+            <button id="botonmodificar" class="btn btn-info">Modificar hospital</button>
         </div>
     </main>
     <script src="js/bootstrap.bundle.min.js"></script>
     <script src="js/jquery-3.7.1.js"></script>
     <script>
+        var url = "https://apicrudhospital.azurewebsites.net/";
         $(document).ready(function(){
-            
+            var params = new window.URLSearchParams(window.location.search);
+            var idHospital = params.get("idhospital");
+            var request = "webresources/hospitales/" + idHospital;
+            $.ajax({
+                url: url + request,
+                type: "GET",
+                success: function(data){
+                    console.log("Leyendo");
+                    $("#cajaid").val(data.idhospital);
+                    $("#cajanombre").val(data.nombre);
+                    $("#cajadireccion").val(data.direccion);
+                    $("#cajatelefono").val(data.telefono);
+                    $("#cajacamas").val(data.camas);
+                }
+            });
+            $("#botonmodificar").click(function(){
+                var id = parseInt($("#cajaid").val());
+                var nombre = $("#cajanombre").val();
+                var direccion = $("#cajadireccion").val();
+                var telefono = $("#cajatelefono").val();
+                var camas = parseInt($("#cajacamas").val());
+                var hospital = new Object();
+                hospital.idhospital = id;
+                hospital.nombre = nombre;
+                hospital.direccion = direccion;
+                hospital.telefono = telefono;
+                hospital.camas = camas;
+                var hospitalJSON = JSON.stringify(hospital);
+                console.log(hospitalJSON);
+                var request = "/webresources/hospitales/put";
+                $.ajax({
+                    url: url + request,
+                    type: "PUT",
+                    contentType: "application/json",
+                    data: hospitalJSON,
+                    success: function(){
+                        console.log("Update");
+                        window.location.href = "web28detailshospital.html?idhospital=" + id;
+                    }
+                });
+            });
         });
     </script>
 </body>

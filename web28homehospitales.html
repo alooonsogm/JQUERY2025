@@ -215,6 +215,25 @@
     <script>
         var url = "https://apicrudhospital.azurewebsites.net/";
         $(document).ready(function(){
+            //El codigo de delete se hace antes, y si existe la variable iddelete se borra sino se muestra.
+            var params = new window.URLSearchParams(window.location.search);
+            var iddelete = params.get("iddelete");
+            if(iddelete != null){
+                var requestDelete = "webresources/hospitales/delete/" + iddelete;
+                $.ajax({
+                    url: url + requestDelete,
+                    type: "DELETE",
+                    success: function(){
+                        console.log("Hospital eliminado: " + iddelete);
+                        cargarHospitales();
+                    }
+                });
+            } else {
+                cargarHospitales();
+            }
+        });
+
+        function cargarHospitales(){
             var request = "webresources/hospitales";
             $.ajax({
                 url: url + request,
@@ -230,13 +249,14 @@
                         //web28detailshospital.html?idhospital=99
                         html += "<a href='web28detailshospital.html?idhospital=" + hospital.idhospital + "' class='btn btn-success'>Details</a>";
                         html += "<a href='web28edithospital.html?idhospital=" + hospital.idhospital + "' class='btn btn-info'>Edit</a>";
+                        html += "<a href='web28homehospitales.html?iddelete=" + hospital.idhospital + "' class='btn btn-danger'>Delete</a>";
                         html += "</td>";
                         html += "</tr>";
                     });
                     $("#tablaHospitales tbody").html(html);
                 }
-            })
-        });
+            });
+        }
     </script>
 </body>
 
