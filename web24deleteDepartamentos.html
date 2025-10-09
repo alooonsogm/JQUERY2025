@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JQUERY</title>
+</head>
+<body>
+    <h1>Borrar departamentos json</h1>
+    <ul id="losDepartamentos"></ul>
+
+    <script src="js/jquery-3.7.1.js"></script>
+    <script>
+        var url = "https://apicruddepartamentospgs.azurewebsites.net/";
+        $(document).ready(function(){
+            mostrarDepartamentos();
+        });
+
+        function mostrarDepartamentos(){
+            var request = "/webresources/departamentos";
+<<<<<<< HEAD
+            $("#losDepartamentos").html("");
+            $.ajax({
+                url: url + request,
+                type: "GET",
+                success: function(data){
+                    console.log("Leyendo");
+                    $.each(data, function(index, departamento){
+                        var li = $("<li>", {"text": departamento.nombre});
+                        var boton = $("<button>", {"text": "delete " + departamento.localidad, "value": departamento.numero});
+                        li.append(boton);
+                        $("#losDepartamentos").append(li);
+                        boton.click(function(){
+                            var id = $(this).val();
+                            var request = "webresources/departamentos/delete/" + id;
+                            $.ajax({
+                               url: url + request,
+                                type: "DELETE",
+                                success: function(){
+                                    console.log("Eliminado");
+                                    mostrarDepartamentos();
+                                }
+                            });
+=======
+            $.getJSON(url + request, function(data){
+                console.log("Leyendo...");
+                $.each(data, function(index, departamento){
+                    var li = $("<li>");
+                    li.text(departamento.nombre);
+                    $("#losDepartamentos").append(li);
+                    var boton = $("<button>");
+                    boton.text("Borrar");
+                    boton.val(departamento.numero);
+                    $("#losDepartamentos").append(boton);
+                    boton.click(function(){
+                        $("#losDepartamentos").html("");
+                        var idDepartamento = boton.val();
+                        var request = "/webresources/departamentos/delete/" + idDepartamento;
+                        $.ajax({
+                            url: url + request,
+                            type: "DELETE",
+                            success: function(){
+                                console.log("Eliminado");
+                                mostrarDepartamentos();
+                            }
+>>>>>>> 115a66d59b47b0095c45bf81f7bf10acfc8341fe
+                        });
+                    });
+                }
+            })
+        }
+    </script>
+</body>
+</html>

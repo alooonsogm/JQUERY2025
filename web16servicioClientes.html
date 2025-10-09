@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JQUERY</title>
+</head>
+<body>
+    <h1>Servicio XML clientes</h1>
+    <label>Selecciona un cliente:</label>
+    <select id="selectClientes"></select>
+    <div id="resultado"></div>
+
+    <script src="js/jquery-3.7.1.js"></script>
+    <script>
+        $(document).ready(function(){
+            $.get("https://apiclientesxml.azurewebsites.net/api/Clientes/GetClientesXML", function(data){
+                console.log("Leyendo 1...");
+                var html = "";
+                $(data).find("CLIENTE").each(function(){
+                    html += "<option value='" + $(this).attr("IDCLIENTE") +"'>" + $(this).find("NOMBRE").text() + "</option>";
+                });
+                $("#selectClientes").html(html);
+            });
+
+            $("#selectClientes").change(function(){
+                $.get("https://apiclientesxml.azurewebsites.net/api/Clientes/GetClientesXML", function(data){
+                    var html2 = "";
+                    var idCliente = $("#selectClientes").val();
+                    var elCliente = $(data).find("CLIENTE[IDCLIENTE=" + idCliente + "]");
+                    html2 += "<p>ID cliente: "+ idCliente + "</p>";
+                    html2 += "<p>Nombre: "+ elCliente.find("NOMBRE").text() + "</p>";
+                    html2 += "<p>Direccion: "+ elCliente.find("DIRECCION").text() + "</p>";
+                    html2 += "<p>Email: "+ elCliente.find("EMAIL").text() + "</p>";
+                    html2 += "<p>Código postal: "+ elCliente.find("CODIGOPOSTAL").text() + "</p>";
+                    html2 += "<p>Página web: "+ elCliente.find("PAGINAWEB").text() + "</p>";
+                    html2 += "<p>Imagen del cliente:</p>";
+                    html2 += "<img src='" + elCliente.find("IMAGENCLIENTE").text() + "'>";
+                    $("#resultado").html(html2);
+                });
+            })
+        });
+    </script>
+</body>
+</html>

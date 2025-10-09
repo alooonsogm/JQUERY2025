@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JQUERY</title>
+</head>
+<body>
+    <h1>Filtros XML</h1>
+    <label>Introduzca tu ID:</label>
+    <input type="text" id="cajaID">
+    <button id="botonAtributo">Buscar atributo ID</button>
+    <hr>
+    <label>Introduzca localidad:</label>
+    <input type="text" id="cajaLocalidad">
+    <button id="botonLocalidad">Buscar localidad contains</button>
+    <hr>
+    <h1 style="color: fuchsia;" id="mensaje"></h1>
+    <ul id="listaDepartamentos"></ul>
+
+    <script src="js/jquery-3.7.1.js"></script>
+    <script>
+        $(document).ready(function(){
+            $("#botonAtributo").click(function(){
+                $.get("documents/departamentos.xml", function(data){
+                    console.log("Leyendo...");
+                    //El filtro sera el siguiente: DEPT[DEPT_NO=10]
+                    var id = $("#cajaID").val();
+                    var filtro = "DEPT[DEPT_NO=" + id + "]";
+                    //Solamente tenemos un ID por departamento
+                    var nododept = $(data).find(filtro).first();
+                    var nombre = $(nododept).find("DNOMBRE").text();
+                    var localidad = $(nododept).find("LOC").text();
+                    $("#mensaje").text("Departamento: " + nombre + " Localidad: " +localidad);
+                });
+            });
+
+            $("#botonLocalidad").click(function(){
+                $.get("documents/departamentos.xml", function(data){
+                    console.log("Leyendo...");
+                    var localidad = $("#cajaLocalidad").val();
+                    //El filtro sera el siguiente: LOC:contains(GIJON)
+                    var filtro = "LOC:contains(" + localidad + ")";
+                    //Son varios los elementos que podriamos recorrer (each).
+                    var html = "";
+                    //Primera version
+                    // $(data).find(filtro).each(function(){
+                    //     var cosa = $(this).text();
+                    //     html += "<li>" + cosa + "</li>";
+                    // });
+                    // $("#listaDepartamentos").html(html);
+
+                    //Segunda version
+                    if($(data).find(filtro).length == 0){
+                        html += "<li>La localidad: " + $("#cajaLocalidad").val() + " no existe en el XML</li>";
+                    } else {
+                        $(data).find(filtro).each(function(){
+                        var loc = $(this).text();
+                        var nombre = $(this).parent().find("DNOMBRE").text();
+                        var codigo = $(this).parent().attr("DEPT_NO");
+                        html += "<li>Localidad: " + loc + "</li>";
+                        html += "<li>Nombre: " + nombre + "</li>";
+                        html += "<li>Código departamento: " + codigo + "</li>";
+                     });
+                    }
+                     $("#listaDepartamentos").html(html);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

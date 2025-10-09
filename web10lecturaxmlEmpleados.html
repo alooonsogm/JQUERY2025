@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JQUERY</title>
+</head>
+<body>
+    <h1>XML empleados</h1>
+    <button id="botonLeer">Leer XML Empleados</button>
+    <ul id="listaEmpleados"></ul>
+
+    <script src="js/jquery-3.7.1.js"></script>
+    <script>
+        $(document).ready(function(){
+            $("#botonLeer").click(function(){
+                console.log("Antes del servicio.");
+
+                $.get("documents/empleados.xml", function(data){
+                    console.log("Leyendo servicio.");
+                    var html = "";
+                    //Buscamos la etiqueta <APELLIDO>
+                    //Antes del .each el find te devuleve un array, ya sea un apellido o varios.
+                    $(data).find("APELLIDO").each(function(){
+                        //El contenido ya es accesible.
+                        var apellido = $(this).text(); //el this es cada variable que hay dentro del array que se recorre con .each
+                        html += "<li>" + apellido + "</li>";
+                    });
+                    $("#listaEmpleados").html(html);
+                });
+
+                console.log("Despues del servicio.");
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JQUERY</title>
+</head>
+<body>
+    <h1>Maestro detalle empleados departamentos</h1>
+    <ul id="losDepartamentos"></ul>
+    <div id="laTabla"></div>
+
+    <script src="js/jquery-3.7.1.js"></script>
+    <script>
+        var urlDepartamentos = "https://apicruddepartamentospgs.azurewebsites.net/";
+        var urlEmpleados = "https://apiempleadosspgs.azurewebsites.net/";
+        $(document).ready(function(){
+            cargarDepartamentos();
+        });
+
+        function cargarDepartamentos(){
+            var request = "webresources/departamentos";
+            $.ajax({
+                url: urlDepartamentos + request,
+                type: "GET",
+                success: function(data){
+                    console.log("Leyendo");
+                    $.each(data, function(index, departamento){
+                        var li = $("<li>", {"text": departamento.nombre});
+                        //Al usar data-iddepartamento, no podemos poner idDepartamento ya que luego al llamar al .data tiene que esta todo 
+                        //en minusculas porque sino no lo reconoce
+                        var boton = $("<a>", {"text": "Empleados", "href":"#" ,"data-iddepartamento": departamento.numero});
+                        li.append(boton);
+                        $("#losDepartamentos").append(li);
+                        boton.click(function(){
+                            var idDepartamento = $(this).data("iddepartamento");
+                            console.log("idDepartamento: " + idDepartamento);
+                            var request = "api/Empleados";
+                            $.ajax({
+                                url: urlEmpleados + request,
+                                type: "GET",
+                                success: function(data){
+                                    console.log("Leyendo2");
+                                    var html = "";
+                                    html += "<table border='1'>";
+                                    html += "<thead>";
+                                    html += "<tr>";
+                                    html += "<th>Apellido</th>";
+                                    html += "<th>Oficio</th>";
+                                    html += "<th>Salario</th>";
+                                    html += "<th>Departamento</th>";
+                                    html += "</tr>";
+                                    html += "</thead>";
+                                    html += "<tbody>";
+                                    $.each(data, function(index, empleado){
+                                        if(empleado.departamento == idDepartamento){
+                                            html += "<tr>";
+                                            html += "<td>" + empleado.apellido + "</td>";
+                                            html += "<td>" + empleado.oficio + "</td>";
+                                            html += "<td>" + empleado.salario + "</td>";
+                                            html += "<td>" + empleado.departamento + "</td>";
+                                            html += "</tr>";
+                                        }
+                                    });
+                                    html += "</tbody>";
+                                    html += "</table>";
+                                    $("#laTabla").html(html);
+                                }
+                            });
+                        });
+                    })
+                }
+            });
+        }
+    </script>
+</body>
+</html>

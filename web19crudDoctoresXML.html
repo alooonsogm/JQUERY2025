@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JQUERY</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 32px 40px;
+        }
+
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-bottom: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+        }
+
+        table th, table td {
+            border: 1px solid #d1d5db;
+            padding: 10px 12px;
+            text-align: left;
+        }
+
+        table th {
+            background: #e3eaf2;
+            color: #34495e;
+        }
+
+        table tr:nth-child(even) {
+            background: #f7fafd;
+        }
+
+        input[type="text"], input[type="number"], select {
+            padding: 8px 10px;
+            border: 1px solid #bfc9d1;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button, input[type="submit"] {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-right: 8px;
+            transition: background 0.2s;
+        }
+
+        button:hover, input[type="submit"]:hover {
+            background: #125ea2;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .alert {
+            padding: 12px 18px;
+            background: #eaf6e7;
+            color: #2e7d32;
+            border: 1px solid #b2dfdb;
+            border-radius: 4px;
+            margin-bottom: 18px;
+        }
+
+        .error {
+            background: #fdecea;
+            color: #c62828;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <h1>Crud Doctores xml</h1>
+    <label>ID doctor:</label>
+    <input type="text" id="cajaID">
+    <label>Apellido:</label>
+    <input type="text" id="cajaApellido">
+    <label>Especialidad:</label>
+    <input type="text" id="cajaEspecialidad">
+    <label>Salario:</label>
+    <input type="text" id="cajaSalario">
+    <label>ID hospital:</label>
+    <input type="text" id="cajaIdHospital">
+    <button id="botonInsert">Insertar</button>
+    <button id="botonUpdate">Modificar</button>
+    <button id="botonDelete">Eliminar</button>
+    <table id="tablaDoctores">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Apellido</th>
+                <th>Especialidad</th>
+                <th>Salario</th>
+                <th>IdHospital</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script src="js/jquery-3.7.1.js"></script>
+    <script>
+        var url = "https://apicruddoctoresxml.azurewebsites.net/";
+        $(document).ready(function(){
+            cargarDoctores();
+            $("#botonInsert").click(function(){
+                var idDoctor = $("#cajaID").val();
+                var apellido = $("#cajaApellido").val();
+                var especialidad = $("#cajaEspecialidad").val();
+                var salario = $("#cajaSalario").val();
+                var idHospital = $("#cajaIdHospital").val();
+                var dataXML = getDoctoresXML(apellido, especialidad, idDoctor, idHospital, salario);
+                var request = "/api/Doctores";
+                $.ajax({
+                    url: url + request,
+                    type: "POST",
+                    contentType: "text/xml",
+                    data: dataXML,
+                    success: function(){
+                        console.log("Insetado");
+                        cargarDoctores();
+                    }
+                });
+            });
+
+            $("#botonUpdate").click(function(){
+                var idDoctor = $("#cajaID").val();
+                var apellido = $("#cajaApellido").val();
+                var especialidad = $("#cajaEspecialidad").val();
+                var salario = $("#cajaSalario").val();
+                var idHospital = $("#cajaIdHospital").val();
+                var dataXML = getDoctoresXML(apellido, especialidad, idDoctor, idHospital, salario);
+                var request = "/api/Doctores";
+                $.ajax({
+                    url: url + request,
+                    type: "PUT",
+                    contentType: "text/xml",
+                    data: dataXML,
+                    success: function(){
+                        console.log("Modificado");
+                        cargarDoctores();
+                    }
+                });
+            });
+
+            $("#botonDelete").click(function(){
+                var idDoctor = $("#cajaID").val();
+                var request = "/api/Doctores/" +idDoctor;
+                $.ajax({
+                    url: url + request,
+                    type: "DELETE",
+                    success: function(){
+                        console.log("Eliminado"),
+                        cargarDoctores();   
+                    }
+                });
+            });
+        });
+
+        function cargarDoctores(){
+            var request = "/api/Doctores";
+            $.get(url + request, function(data){
+                console.log("Leyendo");
+                var html = "";
+                $(data).find("Doctor").each(function(){
+                    var id = $(this).find("IdDoctor").text();
+                    var apellido = $(this).find("Apellido").text();
+                    var especialidad = $(this).find("Especialidad").text();
+                    var salario = $(this).find("Salario").text();
+                    var idhosp = $(this).find("IdHospital").text();
+                    html += "<tr>";
+                    html += "<td>" + id + "</td>";
+                    html += "<td>" + apellido + "</td>";
+                    html += "<td>" + especialidad + "</td>";
+                    html += "<td>" + salario + "</td>";
+                    html += "<td>" + idhosp + "</td>";
+                    html += "</tr>";
+                });
+                $("#tablaDoctores tbody").html(html);
+            });
+        }
+
+        function getDoctoresXML(apellido, especialidad, idDoctor, idHospital, salario){
+            var dataXML = "<Doctor>";
+            dataXML += "<Apellido>" + apellido + "</Apellido>";
+            dataXML += "<Especialidad>" + especialidad + "</Especialidad>";
+            dataXML += "<IdDoctor>" + idDoctor + "</IdDoctor>";
+            dataXML += "<IdHospital>" + idHospital + "</IdHospital>";
+            dataXML += "<Salario>" + salario + "</Salario>";
+            dataXML += "</Doctor>";
+            return dataXML;
+        }
+    </script>
+</body>
+</html>

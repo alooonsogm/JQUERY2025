@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JQUERY</title>
+</head>
+<body>
+    <h1>Departamentos XML service</h1>
+    <button id="elBoton">Cargar datos</button>
+    <ul id="listaDepartamentos"></ul>
+
+    <script src="js/jquery-3.7.1.js"></script>
+    <script>
+        $(document).ready(function(){
+            $("#elBoton").click(function(){
+                $.get("https://apicruddepartamentosxml.azurewebsites.net/api/departamentos", function(data){
+                    console.log("Leyendo...");
+                    var html = "";
+                    $(data).find("Departamento").each(function(){
+                        html += "<li>ID departamento: " + $(this).find("IdDepartamento").text() + "</li>";
+                        html += "<li>Nombre: " + $(this).find("Nombre").text() + "</li>";
+                        html += "<li>Localidad: " + $(this).find("Localidad").text() + "</li>";
+                    });
+                    $("#listaDepartamentos").html(html);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JQUERY</title>
+</head>
+<body>
+    <h1>CRUD Departamentos XML</h1>
+    <label>ID deprtamentos:</label>
+    <input type="text" id="cajaID">
+    <label>Nombre:</label>
+    <input type="text" id="cajaNombre">
+    <label>Localidad:</label>
+    <input type="text" id="cajaLocalidad">
+    <button id="botonInsert">Insertar</button>
+    <button id="botonUpdate">Modificar</button>
+    <button id="botonDelete">Eliminar</button>
+    <table id="tablaDepartamentos">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Localidad</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script src="js/jquery-3.7.1.js"></script>
+    <script>
+        var url = "https://apicruddepartamentosxml.azurewebsites.net/";
+        $(document).ready(function(){
+            loadDepartamentos();
+            $("#botonInsert").click(function(){
+                var id = $("#cajaID").val();
+                var nombre = $("#cajaNombre").val();
+                var localidad = $("#cajaLocalidad").val();
+                //Necesitamos generar un string con la misma estructura que el documento xml para sus registros.
+                var dataXML = getDepartamentoXML(id, nombre, localidad);
+                var request = "api/departamentos";
+                //Realizamos la peticion con ajax
+                $.ajax({
+                   url: url + request,
+                   type: "POST",
+                   contentType: "text/xml",
+                   data: dataXML,
+                   success: function(){
+                        console.log("Insetado");
+                        loadDepartamentos();
+                   }
+                });
+            });
+
+            $("#botonUpdate").click(function(){
+                var id = $("#cajaID").val();
+                var nombre = $("#cajaNombre").val();
+                var localidad = $("#cajaLocalidad").val();
+                var dataXML = getDepartamentoXML(id, nombre, localidad);
+                var request = "api/departamentos";
+                $.ajax({
+                    url: url + request,
+                    type: "PUT",
+                    contentType: "text/xml",
+                    data: dataXML,
+                    success: function(){
+                        console.log("Modificado");
+                        loadDepartamentos();
+                    }
+                });
+            });
+
+            $("#botonDelete").click(function(){
+                var id = $("#cajaID").val();
+                var request = "api/departamentos/" + id;
+                $.ajax({
+                    url: url + request,
+                    type: "DELETE",
+                    success: function(){
+                        console.log("Eliminado");
+                        loadDepartamentos();
+                    }
+                });
+            });
+        });
+
+        function getDepartamentoXML(id, nombre, localidad){
+            //Copiamos el codigo de genracion del objeto XML
+            var dataXML = "<Departamento>";
+            dataXML += "<IdDepartamento>" + id + "</IdDepartamento>";
+            dataXML += "<Nombre>" + nombre + "</Nombre>";
+            dataXML += "<Localidad>" + localidad + "</Localidad>";
+            dataXML += "</Departamento>";
+            return dataXML;
+        }
+
+        function loadDepartamentos(){
+            var request = "/api/departamentos";
+            $.get(url + request, function(data){
+                console.log("Leyendo...");
+                var html = "";
+                $(data).find("Departamento").each(function(){
+                    var id = $(this).find("IdDepartamento").text();
+                    var nombre = $(this).find("Nombre").text();
+                    var localidad = $(this).find("Localidad").text();
+                    html += "<tr>";
+                    html += "<td>" + id + "</td>";
+                    html += "<td>" + nombre + "</td>";
+                    html += "<td>" + localidad + "</td>";
+                    html += "</tr>";
+                });
+                $("#tablaDepartamentos tbody").html(html);
+            });
+        }
+    </script>
+</body>
+</html>

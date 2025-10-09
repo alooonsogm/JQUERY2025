@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JQUERY</title>
+</head>
+<body>
+    <h1>Empleados oficio</h1>
+    <select id="losOficios"></select>
+    <label>Incremento salarial:</label>
+    <br>
+    <input type="text" id="cajaIncremento">
+    <br>
+    <button id="botonIncremento">Incrementar salarios</button>
+    <div id="resultado"></div>
+
+    <script src="js/jquery-3.7.1.js"></script>
+    <script>
+        var url = "https://apiempleadosaction.azurewebsites.net/";
+        $(document).ready(function(){
+            var request = "api/Empleados/GetOficios/oficios";
+            $.ajax({
+                url: url + request,
+                type: "GET",
+                success: function(data){
+                    console.log("Leyendo");
+                    $.each(data, function(index, oficio){
+                        var option = $("<option>", {"text": oficio, "value": oficio});
+                        $("#losOficios").append(option);
+                    });
+                }
+            });
+
+            $("#losOficios").change(function(){
+                mostrarTablaEmpleados();
+            });
+
+            $("#botonIncremento").click(function(){
+                //No haria falta hacer el parseInt ya que se va a usar para concatenar a la URL, si fuera para enviar body o logica saber
+                //que el .val() de un input devuelve siempre String aunque sea un numero.
+                var numeroIncremento = parseInt($("#cajaIncremento").val());
+                var oficio = $("#losOficios").val();
+                var request = "api/Empleados/IncrementarSalarioOficios/" + oficio + "/" + numeroIncremento;
+                $.ajax({
+                    url: url + request,
+                    type: "PUT",
+                    success: function(){
+                        console.log("Incrementado");
+                        mostrarTablaEmpleados();
+                    }
+                });
+            });
+        });
+
+        function mostrarTablaEmpleados(){
+            var oficioEmpleado = $("#losOficios").val();
+            var request = "api/Empleados/GetEmpleadosOficio/empleadosoficio/" + oficioEmpleado;
+            var html = "";
+            html += "<table border='1'>";
+            html += "<thead>";
+            html += "<tr>";
+            html += "<th>Apellido</th>";
+            html += "<th>Oficio</th>";
+            html += "<th>Salario</th>";
+            html += "</tr>";
+            html += "</thead>";
+            html += "<tbody>";
+            $.ajax({
+                url: url + request,
+                type: "GET",
+                success: function(data){
+                    $.each(data, function(index, empleado){
+                        html += "<tr>";
+                        html += "<td>" + empleado.apellido + "</td>";
+                        html += "<td>" + empleado.oficio + "</td>";
+                        html += "<td>" + empleado.salario + "</td>";
+                        html += "</tr>";
+                    });
+                    html += "</tbody>";
+                    html += "</table>";
+                    $("#resultado").html(html);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

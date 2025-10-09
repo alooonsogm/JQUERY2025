@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jquery</title>
+</head>
+<body>
+    <h1>Sumar números</h1>
+    <label>Número 1:</label>
+    <input type="number" id="cajaNumero1">
+    <input type="text" id="cajaNumero2">
+    <button id="botonSumar">Sumar números</button>
+    <h1 id="resultado"></h1>
+    <hr>
+    <h1>Tabla multiplicar</h1>
+    <input type="text" id="cajaTabla">
+    <button id="botonTabla">Tabla multiplicar</button>
+    <table id="tabla"></table>
+
+    <script src="js/jquery-3.7.1.js"></script>
+    <script>
+        $(document).ready(function(){
+            $("#botonSumar").click(function(){
+                //Es necesario poner parseInt porque sino la función val() te devuleve por defecto String.
+                var numero1 = parseInt($("#cajaNumero1").val());
+                var numero2 = parseInt($("#cajaNumero2").val());
+                var resultado = numero1 + numero2;
+                $("#resultado").text("La suma es: " +  resultado);
+            });
+
+            $("#botonTabla").click(function(){
+                var numeroTabla = parseInt($("#cajaTabla").val());
+                var html = "";
+                for(var x = 1; x<=10; x++){
+                    var operacion = numeroTabla * x;
+                    var texto = numeroTabla + " * " + x;
+                    html += "<tr>";
+                    html += "<td>" + texto + "</td>";
+                    html += "<td> = " + operacion + "</td>";
+                    html += "</tr>";   
+                }
+                $("#tabla").html(html);
+            });
+        });
+    </script>
+</body>
+</html>

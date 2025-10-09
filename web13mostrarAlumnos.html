@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JQUERY</title>
+</head>
+<body>
+    <h1>Buscador alumnos notas XML</h1>
+    <label>Introduzca nota:</label>
+    <input type="text" id="laNota">
+    <button id="elBoton">Buscar alumnos</button>
+    <table id="laTabla">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Nota</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script src="js/jquery-3.7.1.js"></script>
+    <script>
+        $(document).ready(function(){
+            $("#elBoton").click(function(){
+                $.get("documents/alumnos.xml", function(data){
+                    console.log("Leyendo...");
+                    var html = "";
+                    var laNota = parseInt($("#laNota").val());
+                    var ayuda = true;
+                    $(data).find("nota").each(function(){
+                        if(laNota <= parseInt($(this).text())){
+                            html += "<tr>";
+                            html += "<td>" + $(this).parent().find("nombre").text() + "</td>";
+                            html += "<td>" + $(this).parent().find("apellidos").text() + "</td>";
+                            html += "<td>" + $(this).text() + "</td>";
+                            html += "</tr>";
+                            ayuda = false;
+                        }
+                    });
+                    if(ayuda == true){
+                        html += "<tr>";
+                        html += "<td>No hay ningun</td>";
+                        html += "<td>alumno con la nota</td>";
+                        html += "<td>igual o superior</td>";
+                        html += "</tr>";
+                    }
+                    $("#laTabla tbody").html(html);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
