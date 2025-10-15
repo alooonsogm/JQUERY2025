@@ -18,7 +18,6 @@
 
         function mostrarDepartamentos(){
             var request = "/webresources/departamentos";
-<<<<<<< HEAD
             $("#losDepartamentos").html("");
             $.ajax({
                 url: url + request,
@@ -41,29 +40,6 @@
                                     mostrarDepartamentos();
                                 }
                             });
-=======
-            $.getJSON(url + request, function(data){
-                console.log("Leyendo...");
-                $.each(data, function(index, departamento){
-                    var li = $("<li>");
-                    li.text(departamento.nombre);
-                    $("#losDepartamentos").append(li);
-                    var boton = $("<button>");
-                    boton.text("Borrar");
-                    boton.val(departamento.numero);
-                    $("#losDepartamentos").append(boton);
-                    boton.click(function(){
-                        $("#losDepartamentos").html("");
-                        var idDepartamento = boton.val();
-                        var request = "/webresources/departamentos/delete/" + idDepartamento;
-                        $.ajax({
-                            url: url + request,
-                            type: "DELETE",
-                            success: function(){
-                                console.log("Eliminado");
-                                mostrarDepartamentos();
-                            }
->>>>>>> 115a66d59b47b0095c45bf81f7bf10acfc8341fe
                         });
                     });
                 }
