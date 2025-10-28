@@ -85,17 +85,20 @@
 
     <main class="container">
         <div class="bg-light p-5 rounded">
-            <div id="resultado"></div>
-            <table id="laTabla" class="table">
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Imagen</th>
-                        <th>Detalles</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+            <h1>Editar jugador</h1>
+            <input type="hidden" id="cajaidjugador" class="form-control"><br>
+            <input type="hidden" id="cajaidequipo" class="form-control"><br>
+            <label>Nombre: </label>
+            <input type="text" id="cajanombre" class="form-control"><br>
+            <label>Posicion: </label>
+            <input type="text" id="cajaposicion" class="form-control"><br>
+            <label>Imagen: </label>
+            <input type="text" id="cajaimagen" class="form-control"><br>
+            <label>Fecha de nacimiento: </label>
+            <input type="text" id="cajafecha" class="form-control"><br>
+            <label>Pais: </label>
+            <input type="text" id="cajapais" class="form-control"><br>
+            <button id="botonmodificar" class="btn btn-info">Modificar juagdor</button>
         </div>
     </main>
 
@@ -110,31 +113,55 @@
             cargarEquipos();
 
             var params = new window.URLSearchParams(window.location.search);
+            var idJugador = params.get("idjugador");
             var idEquipo = params.get("idequipo");
 
-            var boton = $("<a>", {"text": "Volver", "class": "btn btn-info", "href": "web30mostrarequipos.html?idequipo=" + idEquipo});
-            $("#resultado").append(boton);
-
-            var request = "api/Jugadores/JugadoresEquipos/" + idEquipo;
-            var html = "";
+            var request = "api/Jugadores/" + idJugador;
             $.ajax({
                 url: url + request,
                 type: "GET",
                 success: function(data){
-                    console.log("Leyendo juagadores del equipo");
-                    var html = "";
-                    $.each(data, function(index, jugadores){
-                        html += "<tr>";
-                        html += "<td>" + jugadores.nombre + "</td>";
-                        html += "<td><img src='" + jugadores.imagen + "' alt='foto' style='width: 200px; height: 150px;'/></td>";
-                        html += "<td>";
-                        html += "<a class='btn btn-info' href='web30detallesjugadores.html?idjugador=" + jugadores.idJugador + "'>Detalles</a>";
-                        html += "<a class='btn btn-info' href='web30editarjugadores.html?idjugador=" + jugadores.idJugador + "&idequipo=" + jugadores.idEquipo + "'>Editar</a>";
-                        html += "</td>";
-                        html += "</tr>";
-                    });
-                    $("#laTabla tbody").html(html);
+                    $("#cajaidjugador").val(data.idJugador);
+                    $("#cajaidequipo").val(data.idEquipo);
+                    $("#cajanombre").val(data.nombre);
+                    $("#cajaposicion").val(data.posicion);
+                    $("#cajaimagen").val(data.imagen);
+                    $("#cajafecha").val(data.fechaNacimiento);
+                    $("#cajapais").val(data.pais);
                 }
+            });
+
+            $("#botonmodificar").click(function(){
+                var idjugador = parseInt($("#cajaidjugador").val());
+                var nombre = $("#cajanombre").val();
+                var posicion = $("#cajaposicion").val();
+                var imagen = $("#cajaimagen").val();
+                var fecha = $("#cajafecha").val();
+                var pais = $("#cajapais").val();
+                var idequipo = parseInt($("#cajaidequipo").val());
+
+                var jugador = new Object();
+                jugador.idJugador = idjugador;
+                jugador.nombre = nombre;
+                jugador.posicion = posicion;
+                jugador.imagen = imagen;
+                jugador.fechaNacimiento = fecha;
+                jugador.pais = pais;
+                jugador.idEquipo = idequipo;
+                var jugadorJson = JSON.stringify(jugador);
+                console.log(jugadorJson);
+
+                var request = "api/Jugadores/" + idJugador + "/" + idEquipo;
+                $.ajax({
+                    url: url + request,
+                    type: "PUT",
+                    contentType: "application/json",
+                    data: jugadorJson,
+                    success: function(){
+                        console.log("Update");
+                        window.location.href = "web30jugadoresequipo.html?idequipo=" + idEquipo;
+                    }
+                });
             });
         });
 
